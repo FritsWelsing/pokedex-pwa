@@ -72,7 +72,7 @@ function navigeer(pad) {
 
 <style>
 :root {
-  --mdc-theme-primary: #cc0000;
+  --mdc-theme-primary: #2563eb;
   --rood: #cc0000;
 }
 
@@ -87,11 +87,11 @@ body {
 }
 
 .mdc-top-app-bar {
-  background-color: var(--rood);
+  background-color: var(--mdc-theme-primary);
 }
 
 .mdc-drawer__header {
-  background-color: var(--rood);
+  background-color: var(--mdc-theme-primary);
   color: white;
   padding: 16px;
 }

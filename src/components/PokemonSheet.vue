@@ -1,9 +1,11 @@
 <script setup>
 import { ref, watch } from "vue";
+import { isFavoriet, voegFavorietToe, verwijderFavoriet } from "../data/favorieten.js";
 
 const props = defineProps(["pokemon", "open", "allePokemon"]);
-const emit = defineEmits(["sluit", "vorigeVolgende"]);
+const emit = defineEmits(["sluit", "vorigeVolgende", "favorietGewijzigd"]);
 
+const isFav = ref(false);
 const details = ref(null);
 const isLoading = ref(false);
 const fout = ref(null);
@@ -28,6 +30,23 @@ function getPokemonImage(id) {
     img.onerror = () => resolve(pngUrl);
     img.src = gifUrl;
   });
+}
+
+function toggleFavoriet() {
+  if (!details.value) return;
+
+  if (isFavoriet(details.value.id)) {
+    verwijderFavoriet(details.value.id);
+  } else {
+    voegFavorietToe({
+      id: details.value.id,
+      naam: details.value.naam,
+      imageUrl: details.value.imageUrl,
+    });
+  }
+
+  isFav.value = isFavoriet(details.value.id);
+  emit("favorietGewijzigd");
 }
 
 watch(
@@ -58,6 +77,8 @@ watch(
         })),
       };
 
+      isFav.value = isFavoriet(nieuw.id);
+
       // Tab titel en favicon
       document.title = `#${String(nieuw.id).padStart(3, "0")} - ${data.name
         .charAt(0)
@@ -72,6 +93,15 @@ watch(
       fout.value = "Er ging iets mis. Probeer het later opnieuw.";
     } finally {
       isLoading.value = false;
+    }
+  }
+);
+
+watch(
+  () => props.open,
+  (isOpen) => {
+    if (isOpen && props.pokemon) {
+      isFav.value = isFavoriet(props.pokemon.id);
     }
   }
 );
@@ -170,9 +200,11 @@ function capitalize(naam) {
       <button class="footer-knop" @click="gaNaar(-1)">
         <span class="material-icons">arrow_back</span>
       </button>
-      <button class="footer-knop favoriet-knop">
-        <span class="material-icons">favorite_border</span>
+
+      <button class="footer-knop favoriet-knop" @click="toggleFavoriet">
+        <span class="material-icons">{{ isFav ? "favorite" : "favorite_border" }}</span>
       </button>
+
       <button class="footer-knop" @click="gaNaar(1)">
         <span class="material-icons">arrow_forward</span>
       </button>
@@ -415,7 +447,7 @@ function capitalize(naam) {
   bottom: 0;
   left: 0;
   width: 100%;
-  background-color: #cc0000;
+  background-color: var(--mdc-theme-primary);
   display: flex;
   justify-content: space-around;
   align-items: center;

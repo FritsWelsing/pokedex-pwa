@@ -1,6 +1,12 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import PokemonSheet from "../components/PokemonSheet.vue";
+import {
+  getFavorieten,
+  isFavoriet,
+  voegFavorietToe,
+  verwijderFavoriet,
+} from "../data/favorieten.js";
 
 // Alle pokemon (naam + id)
 const allePokemon = ref([]);
@@ -75,6 +81,26 @@ function vorigeVolgende(verschil) {
 function sluitSheet() {
   sheetOpen.value = false;
 }
+
+const favorietIds = ref(getFavorieten().map((p) => p.id));
+
+function toggleFavoriet(pokemon) {
+  if (isFavoriet(pokemon.id)) {
+    verwijderFavoriet(pokemon.id);
+  } else {
+    voegFavorietToe({
+      id: pokemon.id,
+      naam: pokemon.naam,
+      imageUrl: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`,
+    });
+  }
+
+  favorietIds.value = getFavorieten().map((p) => p.id);
+}
+
+function ververs() {
+  favorietIds.value = getFavorieten().map((p) => p.id);
+}
 </script>
 
 <template>
@@ -89,7 +115,9 @@ function sluitSheet() {
         class="card"
         @click="openSheet(pokemon)"
       >
-        <span class="favoriet-knop material-icons" @click.stop="">favorite_border</span>
+        <span class="favoriet-knop material-icons" @click.stop="toggleFavoriet(pokemon)">
+          {{ favorietIds.includes(pokemon.id) ? "favorite" : "favorite_border" }}
+        </span>
         <img
           :src="`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`"
           :alt="pokemon.naam"
@@ -111,6 +139,7 @@ function sluitSheet() {
     :allePokemon="allePokemon"
     @sluit="sluitSheet"
     @vorigeVolgende="vorigeVolgende"
+    @favorietGewijzigd="ververs"
   />
 </template>
 

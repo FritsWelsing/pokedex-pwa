@@ -30,18 +30,6 @@ function getPokemonImage(id) {
   });
 }
 
-function leesKetting(chain) {
-  const resultaat = [];
-  let huidige = chain;
-
-  while (huidige) {
-    resultaat.push(huidige.species.name);
-    huidige = huidige.evolves_to?.[0];
-  }
-
-  return resultaat;
-}
-
 watch(
   () => props.pokemon,
   async (nieuw) => {
@@ -69,25 +57,6 @@ watch(
           verborgen: a.is_hidden,
         })),
       };
-
-      // Evolution chain ophalen
-      const speciesResponse = await fetch(
-        `https://pokeapi.co/api/v2/pokemon-species/${nieuw.id}`
-      );
-      const speciesData = await speciesResponse.json();
-
-      const chainResponse = await fetch(speciesData.evolution_chain.url);
-      const chainData = await chainResponse.json();
-
-      const namen = leesKetting(chainData.chain);
-
-      details.value.evolutionChain = namen.map((naam) => {
-        const gevonden = props.allePokemon.value.find((p) => p.naam === naam);
-        return {
-          naam,
-          id: gevonden ? gevonden.id : null,
-        };
-      });
 
       // Tab titel en favicon
       document.title = `#${String(nieuw.id).padStart(3, "0")} - ${data.name
@@ -190,34 +159,6 @@ function capitalize(naam) {
                 {{ ability.verborgen ? "Hidden ability" : "Ability" }}
               </p>
               <p class="ability-naam">{{ ability.naam.replace(/-/g, " ") }}</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Evolution chain -->
-        <div
-          class="kaart"
-          v-if="details.evolutionChain && details.evolutionChain.length > 1"
-        >
-          <p class="kaart-titel">Evolution chain</p>
-          <div class="chain">
-            <div
-              v-for="(evo, index) in details.evolutionChain"
-              :key="evo.naam"
-              class="chain-item"
-            >
-              <img
-                v-if="evo.id"
-                :src="`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${evo.id}.png`"
-                :alt="evo.naam"
-              />
-              <p class="chain-naam">{{ capitalize(evo.naam) }}</p>
-              <span
-                v-if="index < details.evolutionChain.length - 1"
-                class="material-icons chain-pijl"
-              >
-                arrow_forward
-              </span>
             </div>
           </div>
         </div>
@@ -466,40 +407,6 @@ function capitalize(naam) {
   font-weight: 600;
   text-transform: capitalize;
   margin-top: 4px;
-}
-
-/* Evolution chain */
-.chain {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.chain-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: relative;
-}
-
-.chain-item img {
-  width: 64px;
-  image-rendering: pixelated;
-}
-
-.chain-naam {
-  font-size: 0.75em;
-  font-weight: 600;
-  text-transform: capitalize;
-  text-align: center;
-}
-
-.chain-pijl {
-  color: #cc0000;
-  align-self: center;
-  margin-bottom: 20px;
 }
 
 /* Footer */

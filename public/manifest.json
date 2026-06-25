@@ -2,7 +2,7 @@
   "name": "Pokédex",
   "short_name": "Pokédex",
   "description": "Een PWA Pokédex met Vue.js",
-  "start_url": "/",
+  "start_url": "/Pokedex_P8/",
   "display": "standalone",
   "background_color": "#cc0000",
   "theme_color": "#cc0000",

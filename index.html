@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="nl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pokédex</title>
+
+  <meta name="theme-color" content="#cc0000">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+
+  <!-- Material Design -->
+  <link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
+</head>
+
+<body>
+  <div id="app"></div>
+  <script type="module" src="/src/main.js"></script>
+
+  <script>
+    window.addEventListener('load', () => {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/service-worker.js')
+      }
+    })
+
+    // MDC Drawer initialiseren
+    let drawer
+    document.addEventListener('DOMContentLoaded', () => {
+      drawer = mdc.drawer.MDCDrawer.attachTo(document.querySelector('.mdc-drawer'))
+
+      document.querySelector('.mdc-drawer-scrim').addEventListener('click', () => {
+        drawer.open = false
+      })
+    })
+
+    function openDrawer() {
+      drawer.open = true
+    }
+
+    function sluitDrawer() {
+      drawer.open = false
+    }
+
+    let installPrompt
+    window.addEventListener('beforeinstallprompt', (event) => {
+      event.preventDefault()
+      installPrompt = event
+      setTimeout(() => {
+        const banner = document.getElementById('install-banner')
+        if (banner) banner.style.display = 'flex'
+      }, 3000)
+    })
+
+    function installApp() {
+      installPrompt.prompt()
+      closeBanner()
+    }
+
+    function closeBanner() {
+      const banner = document.getElementById('install-banner')
+      if (banner) banner.style.display = 'none'
+    }
+  </script>
+</body>
+
+</html>
